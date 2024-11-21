@@ -3,33 +3,35 @@
 A FastAPI backend service that generates structured learning paths for different tech careers using AI. The service uses LangChain and OpenAI to create detailed, hierarchical learning paths with resources.
 
 ## Project Structure 
+
+```
 project_root/
-│
 ├── app/
-│ ├── api/
-│ │ └── routes/
-│ │ └── chat.py
-│ │
-│ ├── ai_integration/
-│ │ ├── providers/
-│ │ │ └── langchain_llm.py
-│ │ ├── base.py
-│ │ └── factory.py
-│ │
-│ ├── core/
-│ │ └── settings.py
-│ │
-│ ├── services/
-│ │ └── ai_service.py
-│ │
-│ ├── schemas/
-│ │ └── chat.py
-│ │
-│ └── main.py
+│   ├── api/
+│   │   └── routes/
+│   │       └── chat.py
+│   │
+│   ├── ai_integration/
+│   │   ├── providers/
+│   │   │   └── langchain_llm.py
+│   │   ├── base.py
+│   │   └── factory.py
+│   │
+│   ├── core/
+│   │   └── settings.py
+│   │
+│   ├── services/
+│   │   └── ai_service.py
+│   │
+│   ├── schemas/
+│   │   └── chat.py
+│   │
+│   └── main.py
 │
 ├── .env
 ├── requirements.txt
 └── README.md
+```
 
 ## Features
 
