@@ -23,7 +23,6 @@ class AIService:
             if re.match(r'^\d+\.', line):
                 if current_topic:
                     topics.append(current_topic)
-                # Remove any "Main Topic:" prefix if present
                 topic_name = re.sub(r'^.*?:\s*', '', line.split('.', 1)[1].strip())
                 current_topic = {
                     "id": self._create_id(topic_name),
@@ -37,7 +36,6 @@ class AIService:
             # Subtopic
             elif re.match(r'^[a-z]\)', line):
                 if current_topic:
-                    # Remove any "Subtopic:" prefix if present
                     subtopic_name = re.sub(r'^.*?:\s*', '', re.sub(r'^[a-z]\)\s*', '', line))
                     current_subtopic = {
                         "id": self._create_id(subtopic_name),
@@ -58,7 +56,6 @@ class AIService:
             # Description line
             elif line.startswith('-'):
                 description = line.lstrip('- ').strip()
-                # Remove any "Description:" prefix if present
                 description = re.sub(r'^Description:\s*', '', description)
                 if current_subtopic:
                     current_subtopic["description"] = description
@@ -77,11 +74,9 @@ class AIService:
         elif "course" in line.lower() or "tutorial" in line.lower():
             resource_type = "course"
 
-        # Extract URL
         url_match = re.search(r'https?://[^\s]+', line)
         url = url_match.group(0) if url_match else "https://roadmap.sh"
 
-        # Extract title from square brackets if present
         title_match = re.search(r'\[(.*?)\]', line)
         if title_match:
             title = title_match.group(1)
@@ -101,6 +96,12 @@ class AIService:
 
     async def generate_response(self, prompt: str) -> Dict:
         raw_response = await self.ai_provider.generate_response(prompt)
+        
+        # If the response is already a dictionary (error message), return it directly
+        if isinstance(raw_response, dict):
+            return raw_response
+            
+        # Otherwise, parse the content and create the learning path
         topics = self._parse_topics(raw_response)
         
         return {
