@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import chat
+from api.routes import chat, authentication
 
 app = FastAPI()
 
@@ -15,3 +15,4 @@ app.add_middleware(
 
 # Include routers
 app.include_router(chat.router, prefix="/api") 
+app.include_router(authentication.router, prefix="/api")
