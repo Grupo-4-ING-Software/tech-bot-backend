@@ -1,7 +1,7 @@
 from typing import Dict, List
 import re
-from app.ai_integration.factory import AIProviderFactory
-from app.core.settings import get_settings
+from ai_integration.factory import AIProviderFactory
+from core.settings import get_settings
 
 class AIService:
     def __init__(self):
