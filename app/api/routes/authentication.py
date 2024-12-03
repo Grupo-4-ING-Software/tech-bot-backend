@@ -8,6 +8,10 @@ from services.database_connection_service import sessionLocal, engine
 from schemas.user import User
 from passlib.context import CryptContext
 from pydantic import BaseModel
+from google.auth.transport.requests import Request
+from google.oauth2 import id_token
+from core.settings import get_settings
+import requests
 import json
 
 router = APIRouter()
@@ -15,13 +19,18 @@ router = APIRouter()
 SECRET_KEY = "secret-key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+settings = get_settings()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class UserCreate(BaseModel):
     email: str
     password: str
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto ")
+class GoogleRequest(BaseModel):
+    token: str
+
 
 def get_db():
     db = sessionLocal()
@@ -39,6 +48,12 @@ def create_user(db: Session, user: UserCreate):
     db.add(db_user)
     db.commit()
     return "User created correctly" 
+
+def create_google_user(db: Session, email: str):
+    db_user = User(email=email, hashed_password=None) 
+    db.add(db_user)
+    db.commit()
+    return db_user
 
 @router.post("/register")
 def register_user(
@@ -73,6 +88,56 @@ async def verify_user_token(token: str):
     verify_token(token=token)
     return {"message":"Token is valid"}
 
+@router.post("/login/google")
+async def login_with_google(request: GoogleRequest, db: Session = Depends(get_db)):
+    token = request.token
+    try:
+        id_info = id_token.verify_oauth2_token(token, Request(), settings.GOOGLE_CLIENT_ID)
+
+        email = id_info.get("email")
+        if email is None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Google token")
+        
+        db_user = get_user_by_email(db, email=email)
+        if not db_user:
+            db_user = create_google_user(db, email=email)
+        else:
+            print("User already registered with Google")
+  
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(data={"sub": db_user.email}, expires_delta=access_token_expires)
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail="Invalid Google OAuth token")
+
+@router.post("/register/google")
+async def register_with_google(request: GoogleRequest, db: Session = Depends(get_db)):
+    token = request.token
+    try:
+        id_info = id_token.verify_oauth2_token(token, Request(), get_settings().GOOGLE_CLIENT_ID)
+
+        email = id_info.get("email")
+        if email is None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Google token")
+
+        db_user = get_user_by_email(db, email=email)
+        if db_user:
+            print("User already registered")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Ya existe una cuenta registrada con este correo electrónico"
+            )
+        
+        db_user = create_google_user(db, email=email)
+
+        access_token_expires = timedelta(minutes=30)
+        access_token = create_access_token(data={"sub": db_user.email}, expires_delta=access_token_expires)
+
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid Google OAuth token")
 
 def authenticate_user(email: str, password: str, db: Session):
     user = db.query(User).filter(User.email == email).first()

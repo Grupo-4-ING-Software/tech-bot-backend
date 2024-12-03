@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     DATABASE_HOST: str
     DATABASE_PORT: str
     DATABASE_NAME: str
+    GOOGLE_CLIENT_ID: str
     
     class Config:
         env_file = ".env"
