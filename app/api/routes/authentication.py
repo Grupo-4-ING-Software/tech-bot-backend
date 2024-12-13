@@ -75,13 +75,30 @@ def login_for_access_token(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
-            headers={"WWW-Authenticate":"Bearer"}
+            headers={"WWW-Authenticate": "Bearer"}
         )
+    
+    # Crear token con información del usuario
+    token_data = {
+        "sub": user.email,
+        "user_id": user.id,
+        "email": user.email
+    }
+    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub":user.email}, expires_delta=access_token_expires
+        data=token_data,
+        expires_delta=access_token_expires
     )
-    return {"access_token":access_token, "token_type":"bearer"}
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "email": user.email
+        }
+    }
 
 @router.get("/verify-token/{token}")
 async def verify_user_token(token: str):
@@ -96,20 +113,43 @@ async def login_with_google(request: GoogleRequest, db: Session = Depends(get_db
 
         email = id_info.get("email")
         if email is None:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Google token")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid Google token"
+            )
         
+        # Buscar o crear usuario
         db_user = get_user_by_email(db, email=email)
         if not db_user:
             db_user = create_google_user(db, email=email)
-        else:
-            print("User already registered with Google")
-  
+        
+        # Crear token con información del usuario
+        token_data = {
+            "sub": db_user.email,
+            "user_id": db_user.id,
+            "email": db_user.email
+        }
+        
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(data={"sub": db_user.email}, expires_delta=access_token_expires)
-        return {"access_token": access_token, "token_type": "bearer"}
+        access_token = create_access_token(
+            data=token_data,
+            expires_delta=access_token_expires
+        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": db_user.id,
+                "email": db_user.email
+            }
+        }
 
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail="Invalid Google OAuth token")
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid Google OAuth token"
+        )
 
 @router.post("/register/google")
 async def register_with_google(request: GoogleRequest, db: Session = Depends(get_db)):
@@ -153,7 +193,10 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp":expire})
+    to_encode.update({
+        "exp": expire,
+        "user_id": data.get("user_id")
+    })
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
