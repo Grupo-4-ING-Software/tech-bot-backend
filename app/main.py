@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import chat, authentication
 from core.settings import get_settings
-import os
 
 app = FastAPI(title="Tech Career API")
 settings = get_settings()
@@ -37,8 +36,3 @@ async def health_check():
         "status": "healthy",
         "version": "1.0.0"
     }
-
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
