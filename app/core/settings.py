@@ -15,10 +15,13 @@ class Settings(BaseSettings):
     DATABASE_PORT: str
     DATABASE_NAME: str
     GOOGLE_CLIENT_ID: str
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key")
+    ALLOWED_ORIGINS: str = os.getenv("ALLOWED_ORIGINS", "*")
     
     class Config:
         env_file = os.path.join(ROOT_DIR, '.env')
         env_file_encoding = 'utf-8'
+        case_sensitive = True
 
 @lru_cache()
 def get_settings():
