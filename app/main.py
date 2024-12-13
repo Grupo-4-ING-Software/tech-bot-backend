@@ -1,16 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import chat, authentication
+from core.settings import get_settings
 
 app = FastAPI()
+settings = get_settings()
 
 # Configurar CORS
-origins = [
-    "http://localhost:5173",  # Tu frontend React
-    "http://localhost:3000",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:3000",
-]
+origins = settings.ALLOWED_ORIGINS.split(",") if settings.ALLOWED_ORIGINS != "*" else ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,3 +21,7 @@ app.add_middleware(
 # Include routers
 app.include_router(chat.router, prefix="/api") 
 app.include_router(authentication.router, prefix="/api")
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
