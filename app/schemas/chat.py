@@ -1,5 +1,7 @@
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
+from datetime import datetime
+from uuid import UUID
 
 class Resource(BaseModel):
     title: str
@@ -21,3 +23,13 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     message: Optional[str] = None
     data: Optional[DiagramNode] = None 
+
+class ChatHistory(BaseModel):
+    id: UUID
+    user_id: int
+    prompt: str
+    response: Dict[str, Any]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True 

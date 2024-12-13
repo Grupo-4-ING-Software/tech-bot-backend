@@ -27,7 +27,7 @@ ENV/
 .env
 .venv
 .python-version
-
+.cursorrules
 # IDE
 .idea/
 .vscode/
