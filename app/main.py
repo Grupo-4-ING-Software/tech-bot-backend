@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routes import chat, authentication
 from core.settings import get_settings
 
-app = FastAPI(title="Tech Career API")
+app = FastAPI()
 settings = get_settings()
 
 # Configurar CORS
@@ -22,17 +22,6 @@ app.add_middleware(
 app.include_router(chat.router, prefix="/api") 
 app.include_router(authentication.router, prefix="/api")
 
-@app.get("/")
-async def root():
-    return {
-        "message": "Tech Career API is running",
-        "docs": "/docs",
-        "health": "/health"
-    }
-
 @app.get("/health")
 async def health_check():
-    return {
-        "status": "healthy",
-        "version": "1.0.0"
-    }
+    return {"status": "healthy"}
