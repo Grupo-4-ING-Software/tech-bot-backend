@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, JSON, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 import uuid
-from services.database_connection_service import Base
+from app.services.database_connection_service import Base
 
 class ChatHistory(Base):
     __tablename__ = "chat_history"
@@ -14,5 +14,5 @@ class ChatHistory(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 # Create the table
-from services.database_connection_service import engine
+from app.services.database_connection_service import engine
 ChatHistory.metadata.create_all(bind=engine) 

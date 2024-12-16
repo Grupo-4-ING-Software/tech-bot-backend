@@ -3,7 +3,7 @@ import json
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from ..base import AIProvider
-from core.settings import get_settings
+from app.core.settings import get_settings
 
 class LangchainLLMProvider(AIProvider):
     def __init__(self):

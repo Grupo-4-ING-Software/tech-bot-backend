@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from services.ai_service import AIService
-from schemas.chat import ChatRequest, ChatResponse, ChatHistory
-from models.chat import ChatHistory as ChatHistoryModel
-from services.database_connection_service import get_db
-from api.routes.authentication import verify_token
+from app.services.ai_service import AIService
+from app.schemas.chat import ChatRequest, ChatResponse, ChatHistory
+from app.models.chat import ChatHistory as ChatHistoryModel
+from app.services.database_connection_service import get_db
+from app.api.routes.authentication import verify_token
 from uuid import UUID
 import json
 from datetime import datetime

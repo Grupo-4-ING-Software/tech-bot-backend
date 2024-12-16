@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import chat, authentication
-from core.settings import get_settings
+from app.api.routes import chat, authentication
+from app.core.settings import get_settings
 
 app = FastAPI()
 settings = get_settings()

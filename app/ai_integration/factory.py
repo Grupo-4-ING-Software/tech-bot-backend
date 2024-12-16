@@ -1,6 +1,6 @@
 from typing import Dict, Type
-from .base import AIProvider
-from .providers.langchain_llm import LangchainLLMProvider
+from app.ai_integration.base import AIProvider
+from app.ai_integration.providers.langchain_llm import LangchainLLMProvider
 
 class AIProviderFactory:
     _providers: Dict[str, Type[AIProvider]] = {
