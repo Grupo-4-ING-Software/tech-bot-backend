@@ -1,11 +1,11 @@
 export const getChatToken = async (): Promise<string> => {
-  const response = await fetch(`${API_BASE_URL}/api/chat/token`, {
+  const response = await fetch(`${API_BASE_URL}/api/login/google`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${getAccessToken()}` // Si usas token de autenticación
+      'Authorization': `Bearer ${getAccessToken()}`
     },
-    credentials: 'include' // Si usas cookies
+    credentials: 'include'
   });
 
   if (!response.ok) {

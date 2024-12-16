@@ -1,16 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from services.ai_service import AIService
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
-from services.database_connection_service import sessionLocal, engine
-from schemas.user import User
+from app.services.database_connection_service import sessionLocal, engine
+from app.schemas.user import User
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from google.auth.transport.requests import Request
 from google.oauth2 import id_token
-from core.settings import get_settings
+from app.core.settings import get_settings
 import requests
 import json
 

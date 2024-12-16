@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql import func
-from services.database_connection_service import Base
-from services.database_connection_service import engine
+from app.services.database_connection_service import Base
+from app.services.database_connection_service import engine
 
 class User(Base):
     __tablename__ = "users"

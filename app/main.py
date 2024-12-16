@@ -7,7 +7,12 @@ app = FastAPI()
 settings = get_settings()
 
 # Configurar CORS
-origins = settings.ALLOWED_ORIGINS.split(",") if settings.ALLOWED_ORIGINS != "*" else ["*"]
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://localhost:8000",
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,8 +24,8 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(chat.router, prefix="/api") 
 app.include_router(authentication.router, prefix="/api")
+app.include_router(chat.router, prefix="/api")
 
 @app.get("/health")
 async def health_check():
